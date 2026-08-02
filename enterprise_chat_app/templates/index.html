@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Connect App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for reliable icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #313338; color: #f8fafc; }
+        .sidebar-bg { background-color: #2B2D31; }
+        .main-bg { background-color: #313338; }
+        .channel-hover:hover { background-color: rgba(255,255,255,0.05); }
+        .channel-active { background-color: rgba(255, 255, 255, 0.08); color: #fff; }
+        .message-hover:hover { background-color: rgba(0,0,0,0.08); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2B2D31; }
+
+        .glass-panel { background: #2B2D31; border-left: 1px solid #1e1f22; }
+        
+        /* Message Action Bar Animation */
+        .msg-action-bar { opacity: 0; transform: translateY(-5px); transition: all 0.1s ease; }
+        .message-hover:hover .msg-action-bar { opacity: 1; transform: translateY(0); }
+        
+        /* Typing Indicator Animation */
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden main-bg text-[#DBDEE1]">
+
+    <!-- Sidebar Servers/Workspaces -->
+    <div class="w-[72px] bg-[#1E1F22] flex flex-col items-center py-4 gap-3 border-r border-black/20 flex-shrink-0 z-20">
+        <a href="/app" class="w-12 h-12 bg-[#5865F2] rounded-[16px] flex items-center justify-center shadow-lg text-white hover:rounded-xl transition-all cursor-pointer relative group">
+            <i class="fa-solid fa-infinity text-2xl"></i>
+            <div class="absolute left-16 bg-black text-white text-sm font-semibold px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg transition-opacity z-50">Nexus Connect HQ</div>
+        </a>
+        <div class="w-8 h-[2px] bg-[#313338] rounded-full"></div>
+        
+        {% if current_user.role == 'admin' %}
+        <a href="/it/noc/diagnostics" class="w-12 h-12 bg-[#313338] rounded-[24px] flex items-center justify-center text-[#23a559] hover:bg-[#23a559] hover:text-white hover:rounded-xl transition-all cursor-pointer relative group" title="IT Admin Tools">
+            <i class="fa-solid fa-terminal text-xl"></i>
+            <div class="absolute left-16 bg-black text-white text-sm font-semibold px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg transition-opacity z-50">Admin Tools</div>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar Channels -->
+    <div class="w-[280px] sidebar-bg flex flex-col border-r border-black/10 flex-shrink-0 z-10">
+        <!-- Header -->
+        <div class="h-12 flex items-center px-4 border-b border-black/20 shadow-sm cursor-pointer hover:bg-white/5 transition-colors">
+            <h1 class="font-bold text-white tracking-tight text-[15px]">CorpNet HQ</h1>
+            <i class="fa-solid fa-chevron-down ml-auto text-xs text-[#DBDEE1]"></i>
+        </div>
+
+        <!-- Channels -->
+        <div class="flex-1 overflow-y-auto py-4">
+            <div class="px-2 mb-4">
+                <div class="flex items-center justify-between text-xs font-semibold text-[#949BA4] hover:text-[#DBDEE1] cursor-pointer mb-1 px-1">
+                    <span class="uppercase tracking-wider">Channels</span>
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <div class="space-y-[2px]">
+                    <a href="/app" class="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-[15px] {% if active_channel == 'general' %}channel-active font-medium{% else %}text-[#949BA4] channel-hover font-medium{% endif %} transition-colors">
+                        <i class="fa-solid fa-hashtag text-lg text-[#80848E]"></i> general
+                    </a>
+                    <a href="#" class="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-[15px] text-[#949BA4] channel-hover font-medium transition-colors">
+                        <i class="fa-solid fa-hashtag text-lg text-[#80848E]"></i> engineering
+                    </a>
+                </div>
+            </div>
+
+            <!-- Direct Messages -->
+            <div class="px-2">
+                <div class="flex items-center justify-between text-xs font-semibold text-[#949BA4] hover:text-[#DBDEE1] cursor-pointer mb-1 px-1">
+                    <span class="uppercase tracking-wider">Direct Messages</span>
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <div class="space-y-[2px]">
+                    {% for u in users %}
+                    {% if u.username != current_user.username %}
+                    <a href="/app/{{ u.username }}" class="flex items-center gap-3 px-2 py-1.5 rounded-md text-[15px] {% if active_channel == u.username %}channel-active font-medium{% else %}text-[#949BA4] channel-hover font-medium{% endif %} transition-colors group">
+                        <div class="relative flex-shrink-0">
+                            <!-- Better avatars -->
+                            <div class="w-8 h-8 rounded-full bg-[#1E1F22] flex items-center justify-center overflow-hidden">
+                                <img src="https://ui-avatars.com/api/?name={{ u.username }}&background=1E1F22&color=fff&size=64&bold=true" class="w-full h-full" alt="Avatar">
+                            </div>
+                            
+                            <!-- Dynamic Status Dot -->
+                            {% if u.username == 't.admin' %}
+                                <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#F0B232] rounded-full border-[3px] border-[#2B2D31]" title="Idle"></div>
+                            {% elif u.username == 'a.mercer' %}
+                                <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#F23F43] rounded-full border-[3px] border-[#2B2D31] flex items-center justify-center" title="Do Not Disturb"><div class="w-1.5 h-0.5 bg-[#2B2D31] rounded-full"></div></div>
+                            {% else %}
+                                <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#23A559] rounded-full border-[3px] border-[#2B2D31]" title="Online"></div>
+                            {% endif %}
+                        </div>
+                        <span class="truncate">{{ u.username }}</span>
+                        
+                        <!-- IDOR Profile Trigger -->
+                        <button onclick="event.preventDefault(); viewProfile({{ u.id }})" class="ml-auto opacity-0 group-hover:opacity-100 hover:text-white transition-opacity text-[#B5BAC1]" title="View Profile">
+                            <i class="fa-solid fa-user"></i>
+                        </button>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Area -->
+        <div class="h-[52px] bg-[#232428] flex items-center px-2 flex-shrink-0">
+            <a href="/app/settings" class="flex items-center gap-2 hover:bg-[#313338] p-1 rounded-md transition-colors cursor-pointer w-full group">
+                <div class="relative">
+                    <div class="w-8 h-8 rounded-full bg-[#5865F2] flex items-center justify-center overflow-hidden">
+                        <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=5865F2&color=fff&size=64&bold=true" class="w-full h-full" alt="Me">
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#23A559] rounded-full border-[3px] border-[#232428]"></div>
+                </div>
+                <div class="min-w-0 pb-0.5">
+                    <p class="text-[13px] font-bold text-white leading-tight truncate group-hover:text-[#DBDEE1] transition-colors">{{ current_user.username }}</p>
+                    <p class="text-[11px] text-[#B5BAC1] leading-tight truncate group-hover:text-[#DBDEE1]">Online</p>
+                </div>
+                <div class="ml-auto flex items-center gap-1 text-[#B5BAC1]">
+                    <div class="w-8 h-8 rounded hover:bg-[#3f4147] flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-gear"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <main class="flex-1 flex flex-col min-w-0 relative">
+        
+        <!-- Chat Header -->
+        <div class="h-12 border-b border-black/20 flex items-center justify-between px-4 flex-shrink-0 bg-[#313338] z-10 shadow-sm absolute top-0 w-full">
+            <div class="flex items-center gap-2">
+                {% if active_channel == 'general' %}
+                    <i class="fa-solid fa-hashtag text-xl text-[#80848E]"></i>
+                    <h2 class="font-bold text-[15px] text-white tracking-wide">general</h2>
+                {% else %}
+                    <i class="fa-solid fa-at text-xl text-[#80848E]"></i>
+                    <h2 class="font-bold text-[15px] text-white tracking-wide">{{ active_channel }}</h2>
+                    <div class="w-2 h-2 rounded-full bg-[#23A559] ml-1"></div>
+                {% endif %}
+            </div>
+            
+            <div class="flex items-center gap-4 text-[#B5BAC1]">
+                <i class="fa-solid fa-phone text-lg hover:text-[#DBDEE1] cursor-pointer transition-colors" title="Start Call"></i>
+                <i class="fa-solid fa-video text-lg hover:text-[#DBDEE1] cursor-pointer transition-colors" title="Start Video Call"></i>
+                <div class="bg-[#1E1F22] rounded-[4px] flex items-center px-1.5 py-1 gap-1.5 w-36 transition-colors shadow-inner">
+                    <input type="text" placeholder="Search" class="bg-transparent border-none outline-none text-[13px] text-white w-full placeholder-[#949BA4]">
+                    <i class="fa-solid fa-magnifying-glass text-[13px] text-[#949BA4]"></i>
+                </div>
+                <i class="fa-solid fa-inbox text-lg hover:text-[#DBDEE1] cursor-pointer transition-colors"></i>
+                <i class="fa-solid fa-circle-question text-lg hover:text-[#DBDEE1] cursor-pointer transition-colors"></i>
+            </div>
+        </div>
+
+        <!-- Messages List -->
+        <div class="flex-1 overflow-y-auto px-4 pt-14 pb-4" id="chat-container">
+            <div class="mb-4 pt-6 pb-2 border-b border-white/5">
+                {% if active_channel == 'general' %}
+                    <div class="w-[68px] h-[68px] bg-[#41434A] rounded-full flex items-center justify-center mb-4 text-white">
+                        <i class="fa-solid fa-hashtag text-4xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold mb-2 text-white">Welcome to #general!</h1>
+                    <p class="text-[#B5BAC1] text-[15px]">This is the start of the #general channel. This channel is for company-wide announcements and chatter.</p>
+                {% else %}
+                    <div class="w-[68px] h-[68px] rounded-full overflow-hidden mb-4 bg-[#1E1F22]">
+                        <img src="https://ui-avatars.com/api/?name={{ active_channel }}&background=1E1F22&color=fff&size=128&bold=true" alt="Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <h1 class="text-3xl font-bold mb-2 text-white">{{ active_channel }}</h1>
+                    <p class="text-[#B5BAC1] text-[15px]">This is the beginning of your direct message history with <strong>@{{ active_channel }}</strong>.</p>
+                {% endif %}
+            </div>
+
+            <div class="space-y-0 pb-2">
+                {% set ns = namespace(prev_sender='') %}
+                {% for msg in messages %}
+                
+                {% set is_subsequent = (msg.sender == ns.prev_sender) %}
+                
+                <div class="message-hover relative flex gap-4 px-4 py-1 -mx-4 rounded-[4px] transition-colors group {% if is_subsequent %}mt-0{% else %}mt-[17px]{% endif %}">
+                    
+                    {% if not is_subsequent %}
+                    <div class="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden mt-0.5 cursor-pointer hover:shadow-lg transition-all bg-[#1E1F22]">
+                        <img src="https://ui-avatars.com/api/?name={{ msg.sender }}&background=1E1F22&color=fff&size=64&bold=true" alt="Avatar" class="w-full h-full object-cover">
+                    </div>
+                    {% else %}
+                    <div class="w-10 flex-shrink-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <span class="text-[10px] text-[#949BA4] font-medium mt-1">{{ msg.timestamp[11:16] }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="min-w-0 flex-1">
+                        {% if not is_subsequent %}
+                        <div class="flex items-baseline gap-2 leading-tight mb-0.5">
+                            <!-- Random colors for names like Discord -->
+                            <span class="font-medium text-[15px] text-[#F9A8D4] hover:underline cursor-pointer">{{ msg.sender }}</span>
+                            <span class="text-xs text-[#949BA4] font-medium">{{ msg.timestamp[0:16] }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="text-[15px] text-[#DBDEE1] leading-[22px] pr-24 whitespace-pre-wrap">
+                            <!-- INTENTIONAL XSS: msg.content is not escaped, "|safe" filter allows script execution -->
+                            {{ msg.content | safe }}
+                        </div>
+                    </div>
+
+                    <!-- Message Hover Action Bar -->
+                    <div class="msg-action-bar absolute right-4 -top-3 bg-[#313338] border border-[#2B2D31] rounded-[4px] shadow-sm flex items-center overflow-hidden z-10">
+                        <button class="w-8 h-8 flex items-center justify-center text-[#B5BAC1] hover:text-[#DBDEE1] hover:bg-[#3F4147] transition-colors" title="Add Reaction"><i class="fa-solid fa-face-smile"></i></button>
+                        <button class="w-8 h-8 flex items-center justify-center text-[#B5BAC1] hover:text-[#DBDEE1] hover:bg-[#3F4147] transition-colors" title="Reply"><i class="fa-solid fa-reply"></i></button>
+                        <button class="w-8 h-8 flex items-center justify-center text-[#B5BAC1] hover:text-[#DBDEE1] hover:bg-[#3F4147] transition-colors" title="More"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                </div>
+                
+                {% set ns.prev_sender = msg.sender %}
+                {% endfor %}
+            </div>
+            
+            <!-- Simulated Typing Indicator -->
+            <div id="typing-indicator" class="hidden items-center gap-1.5 text-sm text-[#DBDEE1] font-medium px-4 mt-2 transition-opacity duration-300">
+                <div class="flex gap-1 ml-1 mr-1">
+                    <div class="w-1.5 h-1.5 bg-[#DBDEE1] rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-[#DBDEE1] rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-[#DBDEE1] rounded-full typing-dot"></div>
+                </div>
+                <span class="font-bold" id="typing-user"></span> is typing...
+            </div>
+        </div>
+
+        <!-- Message Input -->
+        <div class="px-4 pb-6 pt-0 relative z-20">
+            {% set submit_url = "/app/" + active_channel if active_channel != 'general' else "/app" %}
+            <form method="POST" action="{{ submit_url }}" class="bg-[#383A40] rounded-[8px] flex flex-col relative overflow-hidden">
+                <!-- File Attachment Fake Dropzone -->
+                <div id="dropzone" class="absolute inset-0 bg-[#5865F2]/20 backdrop-blur-sm border-2 border-dashed border-[#5865F2] hidden flex items-center justify-center text-[#5865F2] font-bold z-10">
+                    <i class="fa-solid fa-upload mr-2 text-xl"></i> Drop files to upload to {% if active_channel == 'general' %}#general{% else %}@{{ active_channel }}{% endif %}
+                </div>
+                
+                <div class="flex px-4 py-2.5 items-center">
+                    <button type="button" class="w-6 h-6 mr-3 flex-shrink-0 flex items-center justify-center bg-[#B5BAC1] hover:bg-[#DBDEE1] text-[#383A40] rounded-full transition-colors" title="Upload File">
+                        <i class="fa-solid fa-plus text-sm"></i>
+                    </button>
+                    <textarea name="content" rows="1" placeholder="Message {% if active_channel == 'general' %}#general{% else %}@{{ active_channel }}{% endif %}" class="w-full resize-none bg-transparent text-[15px] text-[#DBDEE1] outline-none placeholder:text-[#949BA4] self-center leading-[22px] max-h-[50vh]" style="overflow:hidden;"></textarea>
+                    
+                    <div class="flex gap-3 text-[#B5BAC1] ml-3 items-center">
+                        <button type="button" class="hover:text-[#DBDEE1] transition-colors" title="Send a gift"><i class="fa-solid fa-gift text-[22px]"></i></button>
+                        <button type="button" class="hover:text-[#DBDEE1] transition-colors" title="Add GIF"><i class="fa-solid fa-film text-[22px]"></i></button>
+                        <button type="button" class="hover:text-[#DBDEE1] transition-colors" title="Select Emoji"><i class="fa-solid fa-face-smile text-[22px]"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="hidden">Submit</button>
+            </form>
+            <!-- No tip here to keep it perfectly clean like Discord -->
+        </div>
+        
+    </main>
+
+    <!-- Advanced Profile Sidebar -->
+    <div id="profile-modal" class="fixed inset-y-0 right-0 w-[340px] bg-[#2B2D31] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+        
+        <!-- Header Profile Banner -->
+        <div class="h-[120px] bg-indigo-600 relative rounded-t-lg">
+            <button onclick="closeProfile()" class="absolute top-4 right-4 w-7 h-7 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="absolute -bottom-[46px] left-4 w-[92px] h-[92px] rounded-full overflow-hidden border-[6px] border-[#2B2D31] bg-[#1E1F22]">
+                <img id="modal-avatar" src="" alt="Avatar" class="w-full h-full object-cover">
+            </div>
+            <!-- Online status badge on profile -->
+            <div class="absolute -bottom-9 left-[74px] w-7 h-7 bg-[#23A559] rounded-full border-[5px] border-[#2B2D31]" id="modal-status"></div>
+        </div>
+        
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto mt-14 px-4 pb-6">
+            <div class="bg-[#111214] rounded-[8px] p-4 mb-4">
+                <h2 class="text-xl font-bold text-[#F2F3F5] leading-tight" id="modal-username">Loading...</h2>
+                <p class="text-sm font-medium text-[#DBDEE1]" id="modal-title">...</p>
+                
+                <hr class="border-[#2B2D31] my-3">
+                
+                <h4 class="text-[12px] font-bold text-[#DBDEE1] uppercase tracking-wider mb-2">About Me</h4>
+                <p class="text-[14px] text-[#B5BAC1] leading-relaxed" id="modal-bio">...</p>
+                
+                <hr class="border-[#2B2D31] my-3">
+                
+                <h4 class="text-[12px] font-bold text-[#DBDEE1] uppercase tracking-wider mb-2">CorpNet Information</h4>
+                <div class="flex items-center justify-between text-sm text-[#B5BAC1] mb-2">
+                    <span>Department</span>
+                    <span class="font-medium text-[#DBDEE1]" id="modal-dept">...</span>
+                </div>
+                <div class="flex items-center justify-between text-sm text-[#B5BAC1]">
+                    <span>Role Type</span>
+                    <span class="font-medium text-[#DBDEE1]" id="modal-role">...</span>
+                </div>
+            </div>
+
+            <!-- IDOR Vulnerability exposes this internal HR data -->
+            <div class="bg-[#313338] border border-[#F23F43]/30 rounded-[8px] p-4 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-[#F23F43]"></div>
+                <div class="flex items-center gap-1.5 text-[#F23F43] font-bold text-[12px] uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-lock"></i> HR Notes (Classified)
+                </div>
+                <p class="text-sm text-[#DBDEE1] font-mono leading-relaxed" id="modal-notes">...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay for closing sidebar -->
+    <div id="profile-overlay" class="fixed inset-0 bg-black/40 z-40 hidden opacity-0 transition-opacity" onclick="closeProfile()"></div>
+
+    <script>
+        // Scroll to bottom of chat
+        const chatContainer = document.getElementById('chat-container');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Auto-resize textarea
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 400) + 'px';
+        });
+        
+        // Enter to submit
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const val = this.value.trim();
+                if(val !== '') this.closest('form').submit();
+            }
+        });
+
+        // Fake Typing Indicator Logic
+        const users = ['j.doe', 't.admin', 's.smith'];
+        const activeChannel = '{{ active_channel }}';
+        
+        if (activeChannel === 'general' || users.includes(activeChannel)) {
+            // Randomly show typing indicator
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const typingUser = activeChannel === 'general' ? users[Math.floor(Math.random() * users.length)] : activeChannel;
+                    const indicator = document.getElementById('typing-indicator');
+                    document.getElementById('typing-user').innerText = typingUser;
+                    
+                    indicator.classList.remove('hidden');
+                    indicator.classList.add('flex');
+                    
+                    chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll down if they are at bottom
+                    
+                    // Hide after 3-5 seconds
+                    setTimeout(() => {
+                        indicator.classList.add('hidden');
+                        indicator.classList.remove('flex');
+                    }, 3000 + (Math.random() * 2000));
+                }
+            }, 8000); // Check every 8 seconds
+        }
+
+        // Fake File Dropzone
+        const form = document.querySelector('form');
+        const dropzone = document.getElementById('dropzone');
+        
+        form.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('hidden');
+        });
+        form.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('hidden');
+        });
+        form.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('hidden');
+            alert("File upload is restricted in this lab environment.");
+        });
+
+        // IDOR Vulnerability via fetch - Sliding Sidebar
+        async function viewProfile(userId) {
+            const sidebar = document.getElementById('profile-modal');
+            const overlay = document.getElementById('profile-overlay');
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            
+            sidebar.classList.remove('translate-x-full');
+
+            try {
+                // Vulnerable API call: fetches based purely on ID without auth checks on backend
+                const response = await fetch(`/api/directory/profile/${userId}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('modal-username').innerText = "User not found";
+                    document.getElementById('modal-title').innerText = data.error;
+                    document.getElementById('modal-bio').innerText = "-";
+                    document.getElementById('modal-dept').innerText = "-";
+                    document.getElementById('modal-role').innerText = "-";
+                    document.getElementById('modal-notes').innerText = "";
+                } else {
+                    document.getElementById('modal-avatar').src = `https://ui-avatars.com/api/?name=${data.username}&background=1E1F22&color=fff&size=256&bold=true`;
+                    document.getElementById('modal-username').innerText = data.username;
+                    document.getElementById('modal-title').innerText = data.title;
+                    document.getElementById('modal-dept').innerText = data.department;
+                    document.getElementById('modal-role').innerText = data.role.toUpperCase();
+                    document.getElementById('modal-bio').innerText = data.bio || "No bio provided.";
+                    document.getElementById('modal-notes').innerText = data.internal_profile || "No internal notes recorded.";
+                    
+                    // Mock Status Colors
+                    const statusDot = document.getElementById('modal-status');
+                    if (data.username === 't.admin') {
+                        statusDot.className = "absolute -bottom-9 left-[74px] w-7 h-7 bg-[#F0B232] rounded-full border-[5px] border-[#2B2D31]";
+                    } else if (data.username === 'a.mercer') {
+                        statusDot.className = "absolute -bottom-9 left-[74px] w-7 h-7 bg-[#F23F43] rounded-full border-[5px] border-[#2B2D31]";
+                    } else {
+                        statusDot.className = "absolute -bottom-9 left-[74px] w-7 h-7 bg-[#23A559] rounded-full border-[5px] border-[#2B2D31]";
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load profile", e);
+            }
+        }
+
+        function closeProfile() {
+            const sidebar = document.getElementById('profile-modal');
+            const overlay = document.getElementById('profile-overlay');
+            
+            sidebar.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Nexus Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3/dist/phosphor.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
+    <div class="absolute inset-0 bg-slate-900/90"></div>
+    
+    <div class="relative z-10 w-full max-w-md p-8 glass rounded-3xl shadow-2xl">
+        <div class="text-center mb-8 flex flex-col items-center">
+            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20 mb-4">
+                <i class="ph-fill ph-infinity text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-white tracking-tight mb-2">Welcome back</h1>
+            <p class="text-sm text-slate-400">Sign in to your Nexus Connect workspace.</p>
+        </div>
+
+        {% if error %}
+        <div class="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-sm text-center mb-6 flex items-center justify-center gap-2">
+            <i class="ph-bold ph-warning-circle"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/login">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Work Email or Username</label>
+                    <input type="text" name="username" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="name@company.com" required>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-semibold text-slate-300">Password</label>
+                        <a href="#" class="text-xs text-blue-400 hover:underline">Forgot password?</a>
+                    </div>
+                    <input type="password" name="password" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="••••••••" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl mt-8 transition-colors shadow-lg shadow-blue-600/20 text-lg">
+                Sign In
+            </button>
+            
+            <div class="mt-4 text-center">
+                <p class="text-xs text-slate-500">Secured by CorpNet Single Sign-On</p>
+            </div>
+        </form>
+        
+        <div class="mt-8 pt-6 border-t border-slate-700/50 text-center">
+            <p class="text-sm text-slate-400">Don't have a workspace? <a href="/register" class="text-blue-400 font-semibold hover:underline">Sign up</a></p>
+        </div>
+    </div>
+</body>
+</html>

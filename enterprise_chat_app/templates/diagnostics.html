@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Tools | Nexus Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3/dist/phosphor.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .terminal-font { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-16 flex items-center px-8 border-b border-white/10 z-20 bg-slate-900/80 backdrop-blur-md">
+        <a href="/app" class="text-slate-400 hover:text-white font-semibold flex items-center gap-2 transition-colors">
+            <i class="ph-bold ph-arrow-left text-lg"></i> Exit Admin Tools
+        </a>
+        <div class="ml-auto flex items-center gap-4 text-sm font-semibold">
+            <span class="text-amber-500 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i> Elevated Privileges Active</span>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-950 border-r border-white/5 py-6 flex flex-col z-10">
+            <div class="px-6 mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Network Tools</div>
+            
+            <a href="#" class="flex items-center gap-3 px-6 py-3 bg-blue-600/10 text-blue-400 border-l-2 border-blue-500">
+                <i class="ph-fill ph-activity text-xl"></i>
+                <span class="text-sm font-bold">Connectivity Check</span>
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-6 py-3 text-slate-400 hover:bg-white/5 hover:text-slate-300 border-l-2 border-transparent transition-colors">
+                <i class="ph-fill ph-hard-drives text-xl"></i>
+                <span class="text-sm font-medium">Server Status (Offline)</span>
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-6 py-3 text-slate-400 hover:bg-white/5 hover:text-slate-300 border-l-2 border-transparent transition-colors">
+                <i class="ph-fill ph-shield-checkered text-xl"></i>
+                <span class="text-sm font-medium">Firewall Rules (Offline)</span>
+            </a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-10 overflow-y-auto relative">
+            <div class="max-w-4xl">
+                
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">ICMP Diagnostic Ping Tool</h2>
+                    <p class="text-slate-400 text-[15px]">Verify routing paths and node availability across the CorpNet wide area network.</p>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-8 mb-8 shadow-xl">
+                    <form method="POST" action="/it/noc/diagnostics" class="flex items-end gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="ph-fill ph-target text-blue-400"></i> Target Hostname or IPv4 Address
+                            </label>
+                            <input type="text" name="target" value="127.0.0.1" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" required>
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2">
+                            <i class="ph-bold ph-play"></i> Execute
+                        </button>
+                    </form>
+                </div>
+
+                {% if result %}
+                <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl bg-[#0d1117]">
+                    <div class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-slate-300 flex items-center gap-2">
+                            <i class="ph-bold ph-terminal"></i> Standard Output
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <pre class="terminal-font text-sm text-[#5eead4] leading-relaxed overflow-x-auto whitespace-pre-wrap">{{ result }}</pre>
+                    </div>
+                </div>
+                {% endif %}
+                
+            </div>
+            
+            <!-- Decorative background elements -->
+            <div class="absolute top-0 right-0 -mr-32 -mt-32 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        </main>
+    </div>
+</body>
+</html>

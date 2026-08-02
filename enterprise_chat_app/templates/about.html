@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Nexus Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3/dist/phosphor.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-nav { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass-nav h-20 flex items-center justify-between px-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="ph-fill ph-infinity text-white text-2xl"></i>
+            </div>
+            <a href="/" class="font-bold text-xl tracking-tight">Nexus Connect</a>
+        </div>
+        <div class="flex items-center gap-8">
+            <a href="/" class="text-sm font-semibold text-slate-400 hover:text-white transition">Product</a>
+            <a href="/pricing" class="text-sm font-semibold text-slate-400 hover:text-white transition">Pricing</a>
+            <a href="/about" class="text-sm font-semibold text-white">About Us</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/login" class="text-sm font-semibold text-slate-300 hover:text-white transition">Sign In</a>
+            <a href="/register" class="bg-white hover:bg-slate-200 text-slate-900 px-6 py-2.5 rounded-full text-sm font-bold transition">Get Started Free</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 px-10 max-w-5xl mx-auto">
+        <h1 class="text-5xl font-extrabold mb-8 text-center">We believe work should be <span class="text-blue-400">effortless</span>.</h1>
+        <p class="text-xl text-slate-400 text-center mb-16 max-w-3xl mx-auto leading-relaxed">
+            Founded in 2026, CorpNet Enterprises set out to build Nexus Connect with a single mission: to eliminate the friction of modern corporate communication. 
+        </p>
+
+        <div class="grid grid-cols-2 gap-12 mt-16">
+            <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">
+                <i class="ph-fill ph-rocket-launch text-4xl text-blue-400 mb-6"></i>
+                <h3 class="text-2xl font-bold mb-4">Our Mission</h3>
+                <p class="text-slate-400 leading-relaxed">To connect every knowledge worker in the world through a secure, lightning-fast, and deeply integrated platform.</p>
+            </div>
+            <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">
+                <i class="ph-fill ph-shield-check text-4xl text-blue-400 mb-6"></i>
+                <h3 class="text-2xl font-bold mb-4">Enterprise Security</h3>
+                <p class="text-slate-400 leading-relaxed">Security isn't an afterthought. We partner with top security firms to ensure your data is always protected by state-of-the-art encryption and access controls.</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

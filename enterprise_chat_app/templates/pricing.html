@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing | Nexus Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3/dist/phosphor.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-nav { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass-nav h-20 flex items-center justify-between px-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="ph-fill ph-infinity text-white text-2xl"></i>
+            </div>
+            <a href="/" class="font-bold text-xl tracking-tight">Nexus Connect</a>
+        </div>
+        <div class="flex items-center gap-8">
+            <a href="/" class="text-sm font-semibold text-slate-400 hover:text-white transition">Product</a>
+            <a href="/pricing" class="text-sm font-semibold text-white">Pricing</a>
+            <a href="/about" class="text-sm font-semibold text-slate-400 hover:text-white transition">About Us</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/login" class="text-sm font-semibold text-slate-300 hover:text-white transition">Sign In</a>
+            <a href="/register" class="bg-white hover:bg-slate-200 text-slate-900 px-6 py-2.5 rounded-full text-sm font-bold transition">Get Started Free</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 px-10 max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-extrabold mb-6">Simple, transparent pricing</h1>
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto">Choose the plan that fits your team's needs.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Free Plan -->
+            <div class="bg-slate-800/30 rounded-3xl p-8 border border-slate-700 flex flex-col">
+                <h3 class="text-2xl font-bold mb-2">Basic</h3>
+                <p class="text-slate-400 text-sm mb-6">Perfect for small teams getting started.</p>
+                <div class="mb-8">
+                    <span class="text-5xl font-black">$0</span>
+                    <span class="text-slate-400">/mo</span>
+                </div>
+                <ul class="space-y-4 mb-8 flex-grow">
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Up to 10 users</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> 10k message history</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Basic search</li>
+                </ul>
+                <a href="/register" class="block w-full py-3 rounded-xl border border-slate-600 font-bold text-center hover:bg-slate-700 transition">Get Started</a>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="bg-blue-900/20 rounded-3xl p-8 border border-blue-500/50 flex flex-col relative transform md:-translate-y-4 shadow-2xl shadow-blue-900/20">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</div>
+                <h3 class="text-2xl font-bold mb-2 text-blue-400">Professional</h3>
+                <p class="text-slate-400 text-sm mb-6">For scaling teams that need more power.</p>
+                <div class="mb-8">
+                    <span class="text-5xl font-black">$12</span>
+                    <span class="text-slate-400">/user/mo</span>
+                </div>
+                <ul class="space-y-4 mb-8 flex-grow">
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Unlimited users</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Unlimited history</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> AI-powered search</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Guest access</li>
+                </ul>
+                <a href="/register" class="block w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-white text-center transition">Start Free Trial</a>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="bg-slate-800/30 rounded-3xl p-8 border border-slate-700 flex flex-col">
+                <h3 class="text-2xl font-bold mb-2">Enterprise</h3>
+                <p class="text-slate-400 text-sm mb-6">Advanced security and administrative controls.</p>
+                <div class="mb-8">
+                    <span class="text-5xl font-black">Custom</span>
+                </div>
+                <ul class="space-y-4 mb-8 flex-grow">
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Everything in Pro</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> SAML SSO</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Data Loss Prevention</li>
+                    <li class="flex items-center gap-3 text-slate-300"><i class="ph-bold ph-check text-blue-500"></i> Dedicated Support</li>
+                </ul>
+                <a href="#" class="block w-full py-3 rounded-xl border border-slate-600 font-bold text-center hover:bg-slate-700 transition">Contact Sales</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
